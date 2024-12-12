@@ -187,12 +187,14 @@ impl HeaderPanel {
             .label_signal(mode.signal().map(|mode| match mode {
                 Mode::Waves => "Diagrams",
                 Mode::Diagrams => "Waves",
+                Mode::IDE => "IDE",
             }))
             .on_hovered_change(move |is_hovered| hovered.set_neq(is_hovered))
             .on_press(move || {
                 mode.update(|mode| match mode {
                     Mode::Waves => Mode::Diagrams,
-                    Mode::Diagrams => Mode::Waves,
+                    Mode::Diagrams => Mode::IDE,
+                    Mode::IDE => Mode::Waves,
                 })
             })
     }
