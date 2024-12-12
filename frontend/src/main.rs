@@ -12,6 +12,9 @@ use controls_panel::ControlsPanel;
 mod diagram_panel;
 use diagram_panel::{DiagramPanel, ExcalidrawController};
 
+mod ide_panel;
+use ide_panel::{IdePanel, MonacoEditorController};
+
 mod waveform_panel;
 use waveform_panel::{PixiController, WaveformPanel};
 
@@ -39,8 +42,9 @@ enum Mode {
     // @TODO make default
     // #[default]
     Waves,
-    #[default]
     Diagrams,
+    #[default]
+    IDE,
 }
 
 type Filename = String;
@@ -52,6 +56,7 @@ struct Store {
     loaded_filename: Mutable<Option<Filename>>,
     pixi_canvas_controller: Mutable<Mutable<Option<SendWrapper<PixiController>>>>,
     excalidraw_canvas_controller: Mutable<Mutable<Option<SendWrapper<ExcalidrawController>>>>,
+    monaco_editor_controller: Mutable<Mutable<Option<SendWrapper<MonacoEditorController>>>>,
 }
 
 static STORE: Lazy<Store> = lazy::default();
@@ -184,6 +189,12 @@ fn root() -> impl Element {
                     .s(Height::fill())
                     .s(Scrollbars::y_and_clip_x())
                     .item(DiagramPanel::new(excalidraw_canvas_controller.clone()))
+            }
+            Mode::IDE => {
+                Column::new()
+                    .s(Height::fill())
+                    .s(Scrollbars::y_and_clip_x())
+                    .item(IdePanel::new(monaco_editor_controller.clone()))
             }
         })))
         .item(CommandPanel::new())
