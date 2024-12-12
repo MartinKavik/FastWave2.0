@@ -388,7 +388,8 @@ args = [
     "--outfile=../bundles/monaco_editor.js",
     "--format=esm",
     "--minify",
-    "--watch"
+    "--watch",
+    "--loader:.ttf=file",
 ]
 
 [tasks.watch_build_monaco_editor.windows]
