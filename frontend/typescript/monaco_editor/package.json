@@ -1,9 +1,12 @@
 {
   "dependencies": {
-    "monaco-editor": "0.52.2"
+    "@codingame/monaco-vscode-chat-extensions-notebook-task-terminal-testing-common": "11.1.2",
+    "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@11.1.2",
+    "vscode": "npm:@codingame/monaco-vscode-api@11.1.2"
   },
   "devDependencies": {
-    "esbuild": "^0.21.4",
-    "typescript": "^5.4.5"
+    "@types/vscode": "^1.96.0",
+    "esbuild": "^0.21.5",
+    "typescript": "^5.7.2"
   }
 }
