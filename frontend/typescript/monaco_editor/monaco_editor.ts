@@ -1,24 +1,31 @@
-import './style.css';
+import './style.css'
 import * as monaco from 'monaco-editor';
-// import { initialize as initializeEditorWorker } from 'monaco-editor/esm/vs/editor/editor.worker';
+
+export type WorkerLoader = () => Worker;
 
 export class MonacoEditorController {
     constructor() {}
 
     async init(parent_element: HTMLElement) {
-        // window.MonacoEnvironment = {
-        //     getWorker
-        //     getWorkerUrl: function (moduleId, label) {
-        //         return './vs/editor/editor.worker.js';
-        //     }
-        //     // getWorker(_workerId: any, _label: string) {
-        //     //     const worker = new initializeEditorWorker();
-        //     //     console.log(worker);
-        //     //     return worker;
-        //     // }
-        // };
+        const workerLoaders: Partial<Record<string, WorkerLoader>> = {
+            TextEditorWorker: () => new Worker(
+                new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), 
+                { type: 'module' }
+            )
+        }
+        
+        window.MonacoEnvironment = {
+          getWorker: function (_workerId, label) {
+            const workerFactory = workerLoaders[label]
+            if (workerFactory != null) {
+              return workerFactory()
+            }
+            throw new Error(`Worker ${label} not found`)
+          }
+        }
+        
         monaco.editor.create(parent_element, {
-            value: "Hello world!"
+            value: "Hello world!",
         });
     }
 }

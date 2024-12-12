@@ -185,8 +185,8 @@ impl HeaderPanel {
             ))
             .s(RoundedCorners::all(15))
             .label_signal(mode.signal().map(|mode| match mode {
-                Mode::Waves => "Diagrams",
-                Mode::Diagrams => "Waves",
+                Mode::Waves => "Waves",
+                Mode::Diagrams => "Diagrams",
                 Mode::IDE => "IDE",
             }))
             .on_hovered_change(move |is_hovered| hovered.set_neq(is_hovered))
