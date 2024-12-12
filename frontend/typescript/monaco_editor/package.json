@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "monaco-editor": "0.52.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.4",
+    "typescript": "^5.4.5"
+  }
+}

@@ -122,6 +122,7 @@ fn root() -> impl Element {
     let loaded_filename = STORE.loaded_filename.clone();
     let pixi_canvas_controller = STORE.pixi_canvas_controller.clone();
     let excalidraw_canvas_controller = STORE.excalidraw_canvas_controller.clone();
+    let monaco_editor_controller = STORE.monaco_editor_controller.clone();
     Column::new()
         .s(Height::fill())
         .s(Scrollbars::y_and_clip_x())
