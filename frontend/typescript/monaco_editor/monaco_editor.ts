@@ -10,9 +10,8 @@ export class MonacoEditorController {
     async init(parent_element: HTMLElement) {
         const workerLoaders: Partial<Record<string, WorkerLoader>> = {
             editorWorkerService: () => {
-                console.log("WebWorker import.meta.url:", import.meta.url);
                 return new Worker(
-                    new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), 
+                    "/_api/public/monaco_editor/web_worker.js",
                     { type: 'module' }
                 )
             }
@@ -20,7 +19,7 @@ export class MonacoEditorController {
         
         window.MonacoEnvironment = {
           getWorker: function (_workerId, label) {
-            console.log("Getting WebWorker with label: ", label);
+            console.log("Getting WebWorker with label:", label);
             const workerFactory = workerLoaders[label]
             if (workerFactory != null) {
                 return workerFactory()
