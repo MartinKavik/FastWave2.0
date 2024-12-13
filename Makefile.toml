@@ -389,7 +389,7 @@ args = [
     "--format=esm",
     "--minify",
     "--watch",
-    "--loader:.ttf=file",
+    "--loader:.ttf=text",
 ]
 
 [tasks.watch_build_monaco_editor.windows]
