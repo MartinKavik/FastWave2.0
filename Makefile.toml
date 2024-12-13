@@ -31,6 +31,7 @@ run_task = { fork = true, parallel = true, name = [
     "watch_tauri_glue",
     "watch_excalidraw_canvas",
     "watch_monaco_editor",
+    "watch_monaco_editor_web_worker",
 ]}
 
 [tasks.start_browser]
@@ -42,6 +43,7 @@ run_task = { fork = true, parallel = true, name = [
     "watch_tauri_glue",
     "watch_excalidraw_canvas",
     "watch_monaco_editor",
+    "watch_monaco_editor_web_worker",
 ]}
 
 [tasks.start_browser_release]
@@ -53,6 +55,7 @@ run_task = { fork = true, parallel = true, name = [
     "watch_tauri_glue",
     "watch_excalidraw_canvas",
     "watch_monaco_editor",
+    "watch_monaco_editor_web_worker",
 ]}
 
 [tasks.bundle]
@@ -412,3 +415,28 @@ args = [
 
 [tasks.watch_typecheck_monaco_editor.windows]
 command = "node_modules/.bin/tsc.cmd"
+
+## monaco_editor_web_worker ##
+
+[tasks.watch_monaco_editor_web_worker]
+description = "Build and typescheck Typescript on change"
+run_task = { fork = true, parallel = true, name = [
+    "watch_build_monaco_editor_web_worker",
+]}
+
+[tasks.watch_build_monaco_editor_web_worker]
+description = "Compile `frontend/typescript/monaco_editor` on change"
+cwd = "frontend/typescript/monaco_editor"
+command = "node_modules/.bin/esbuild"
+args = [
+    "monaco_editor_web_worker.js",
+    "--bundle",
+    "--outfile=../../../public/monaco_editor/web_worker.js",
+    "--format=esm",
+    "--minify",
+    "--watch",
+    "--loader:.ttf=text",
+]
+
+[tasks.watch_build_monaco_editor_web_worker.windows]
+command = "node_modules/.bin/esbuild.cmd"
