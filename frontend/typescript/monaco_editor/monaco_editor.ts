@@ -1,4 +1,5 @@
-import './style.css'
+// https://github.com/CodinGame/monaco-vscode-api/wiki/Getting-started-guide
+
 import * as monaco from 'monaco-editor';
 
 export type WorkerLoader = () => Worker;
@@ -8,17 +9,21 @@ export class MonacoEditorController {
 
     async init(parent_element: HTMLElement) {
         const workerLoaders: Partial<Record<string, WorkerLoader>> = {
-            TextEditorWorker: () => new Worker(
-                new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), 
-                { type: 'module' }
-            )
+            editorWorkerService: () => {
+                console.log("WebWorker import.meta.url:", import.meta.url);
+                return new Worker(
+                    new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url), 
+                    { type: 'module' }
+                )
+            }
         }
         
         window.MonacoEnvironment = {
           getWorker: function (_workerId, label) {
+            console.log("Getting WebWorker with label: ", label);
             const workerFactory = workerLoaders[label]
             if (workerFactory != null) {
-              return workerFactory()
+                return workerFactory()
             }
             throw new Error(`Worker ${label} not found`)
           }
