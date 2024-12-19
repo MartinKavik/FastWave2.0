@@ -378,7 +378,7 @@ command = "npm.cmd"
 description = "Build and typescheck Typescript on change"
 run_task = { fork = true, parallel = true, name = [
     "watch_build_monaco_editor",
-    "watch_typecheck_monaco_editor",
+    # "watch_typecheck_monaco_editor",
 ]}
 
 [tasks.watch_build_monaco_editor]
