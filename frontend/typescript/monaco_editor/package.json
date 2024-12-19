@@ -2,7 +2,6 @@
   "dependencies": {
     "@codingame/monaco-vscode-chat-extensions-notebook-task-terminal-testing-common": "11.1.2",
     "@codingame/monaco-vscode-languages-service-override": "11.1.2",
-    "@codingame/monaco-vscode-textmate-service-override": "11.1.2",
     "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@11.1.2",
     "vscode": "npm:@codingame/monaco-vscode-api@11.1.2"
   },

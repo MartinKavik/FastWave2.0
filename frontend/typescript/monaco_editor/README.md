@@ -11,7 +11,6 @@ Created with commands:
 - `npm i -E vscode@npm:@codingame/monaco-vscode-api`
 - `npm i -E monaco-editor@npm:@codingame/monaco-vscode-editor-api`
 - `npm i -E @codingame/monaco-vscode-chat-extensions-notebook-task-terminal-testing-common`
-- `npm i -E @codingame/monaco-vscode-textmate-service-override`
 - `npm i -E @codingame/monaco-vscode-languages-service-override`
 - `npm i -D @types/vscode`
 - `npm i -D esbuild typescript@5.5.4`

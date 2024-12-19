@@ -3,7 +3,6 @@
 import * as monaco from 'monaco-editor';
 
 import { initialize } from 'vscode/services'
-import getTextMateServiceOverride from "@codingame/monaco-vscode-textmate-service-override";
 import getLanguagesServiceOverride from "@codingame/monaco-vscode-languages-service-override";
 
 export type WorkerLoader = () => Worker;
@@ -35,7 +34,6 @@ export class MonacoEditorController {
         }
 
         await initialize({
-            // ...getTextMateServiceOverride(),
             ...getLanguagesServiceOverride(),
         });
 
