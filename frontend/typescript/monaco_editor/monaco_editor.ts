@@ -2,6 +2,10 @@
 
 import * as monaco from 'monaco-editor';
 
+import { initialize } from 'vscode/services'
+import getTextMateServiceOverride from "@codingame/monaco-vscode-textmate-service-override";
+import getLanguagesServiceOverride from "@codingame/monaco-vscode-languages-service-override";
+
 export type WorkerLoader = () => Worker;
 
 export class MonacoEditorController {
@@ -28,10 +32,15 @@ export class MonacoEditorController {
           }
         }
 
+        await initialize({
+            // ...getTextMateServiceOverride(),
+            ...getLanguagesServiceOverride(),
+        });
+
         monaco.editor.setTheme("vs-dark")
-        
         monaco.editor.create(parent_element, {
             value: code_example_verilog,
+            language: "verilog"
         });
     }
 }
