@@ -1,47 +1,26 @@
-// https://github.com/CodinGame/monaco-vscode-api/wiki/Getting-started-guide
+// https://davidmyers.dev/blog/how-to-build-a-code-editor-with-codemirror-6-and-typescript/introduction
 
-import * as monaco from 'monaco-editor';
+import { basicSetup, EditorView } from 'codemirror'
+import { oneDark } from '@codemirror/theme-one-dark'
+import { StreamLanguage } from "@codemirror/language"
 
-import { initialize } from 'vscode/services'
-import getLanguagesServiceOverride from "@codingame/monaco-vscode-languages-service-override";
-
-export type WorkerLoader = () => Worker;
+import { verilog } from "@codemirror/legacy-modes/mode/verilog"
+import { scala } from "@codemirror/legacy-modes/mode/clike"
 
 export class MonacoEditorController {
     constructor() {}
 
     async init(parent_element: HTMLElement) {
-        const workerLoaders: Map<string, WorkerLoader> = new Map();
-        workerLoaders.set(
-            "TextEditorWorker",
-            () => {
-                return new Worker(
-                    "/_api/public/monaco_editor/web_worker.js",
-                    { type: 'module' }
-                )
-            }
-        )
-        
-        window.MonacoEnvironment = {
-          getWorker: function (_workerId, label) {
-            console.log("Getting WebWorker with label:", label);
-            const workerFactory = workerLoaders.get(label)
-            if (workerFactory != null) {
-                return workerFactory()
-            }
-            throw new Error(`Worker '${label}' not found`)
-          }
-        }
-
-        await initialize({
-            ...getLanguagesServiceOverride(),
-        });
-
-        monaco.editor.setTheme("vs-dark")
-        monaco.editor.create(parent_element, {
-            value: code_example_verilog,
-            language: "verilog"
-        });
+        new EditorView({
+            doc: code_example_verilog,
+            extensions: [
+                basicSetup,
+                oneDark,
+                StreamLanguage.define(verilog),
+                // StreamLanguage.define(scala),
+            ],
+            parent: parent_element,
+        })
     }
 }
 

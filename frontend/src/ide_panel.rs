@@ -32,6 +32,7 @@ impl IdePanel {
             .s(Align::new().top())
             .s(Width::fill())
             .s(Height::fill())
+            .s(Scrollbars::both())
             .task_with_controller(move |controller| {
                 monaco_editor_controller.set(controller.clone());
                 async {}
