@@ -27,6 +27,8 @@ export class MonacoEditorController {
             throw new Error(`Worker ${label} not found`)
           }
         }
+
+        monaco.editor.setTheme("vs-dark")
         
         monaco.editor.create(parent_element, {
             value: code_example_verilog,
