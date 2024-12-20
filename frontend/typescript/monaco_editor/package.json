@@ -1,12 +1,19 @@
 {
   "dependencies": {
+    "@codemirror/lang-rust": "6.0.1",
     "@codemirror/language": "6.10.7",
     "@codemirror/legacy-modes": "6.4.2",
+    "@codemirror/state": "6.5.0",
     "@codemirror/theme-one-dark": "6.1.2",
-    "codemirror": "6.0.1"
+    "@codemirror/view": "6.36.1",
+    "codemirror": "6.0.1",
+    "codemirror-languageserver": "1.11.0",
+    "events": "3.3.0"
   },
   "devDependencies": {
+    "@types/events": "^3.0.3",
+    "@types/node": "^22.10.2",
     "esbuild": "^0.21.5",
-    "typescript": "^5.7.2"
+    "typescript": "^5.5.4"
   }
 }

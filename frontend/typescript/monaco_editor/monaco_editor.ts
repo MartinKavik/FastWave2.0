@@ -1,26 +1,88 @@
 // https://davidmyers.dev/blog/how-to-build-a-code-editor-with-codemirror-6-and-typescript/introduction
 
-import { basicSetup, EditorView } from 'codemirror'
+// @TODO Rewrite to Rust? (https://crates.io/crates/codemirror)
+
+import { EditorState, Compartment } from '@codemirror/state'
+import { EditorView } from '@codemirror/view'
+import { basicSetup } from 'codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { StreamLanguage } from "@codemirror/language"
+import { languageServer } from 'codemirror-languageserver';
+
+import { rust } from "@codemirror/lang-rust"
 
 import { verilog } from "@codemirror/legacy-modes/mode/verilog"
 import { scala } from "@codemirror/legacy-modes/mode/clike"
+
+// @TODO rename `monaco_editor` to code_editor / codemirror
 
 export class MonacoEditorController {
     constructor() {}
 
     async init(parent_element: HTMLElement) {
-        new EditorView({
+        const filename = "hello.rs";
+
+        const ls = languageServer({
+            // WebSocket server uri and other client options.
+            serverUri: 'ws://localhost:9999',
+            rootUri: 'file:///',
+            workspaceFolders: [],
+        
+            // Alternatively, to share the same client across multiple instances of this plugin.
+            // client: new LanguageServerClient({
+            //     serverUri,
+            //     rootUri: 'file:///'
+            // }),
+        
+            documentUri: `file:///${filename}`,
+            languageId: 'rust' // As defined at https://microsoft.github.io/language-server-protocol/specification#textDocumentItem.
+        });
+
+        const language = new Compartment()
+
+        const state = EditorState.create({
             doc: code_example_verilog,
             extensions: [
                 basicSetup,
                 oneDark,
-                StreamLanguage.define(verilog),
-                // StreamLanguage.define(scala),
+                language.of(StreamLanguage.define(verilog)),
+                ls
             ],
-            parent: parent_element,
         })
+
+        const view = new EditorView({
+            parent: parent_element,
+            state
+        })
+
+        // @TODO remove
+        view.dispatch({
+            effects: language.reconfigure(StreamLanguage.define(scala))
+        })
+
+        // @TODO remove
+        view.dispatch({
+            changes: [
+                { from: 0, to: view.state.doc.length },
+                { from: 0, insert: code_example_scala },
+            ]
+        })
+
+        // @TODO remove
+        view.dispatch({
+            effects: language.reconfigure(rust())
+        })
+
+        // @TODO remove
+        view.dispatch({
+            changes: [
+                { from: 0, to: view.state.doc.length },
+                { from: 0, insert: code_example_rust },
+            ]
+        })
+
+        // @TODO remove
+        console.log("CONTENT: ", view.state.doc.toString())
     }
 }
 
@@ -115,3 +177,8 @@ object sort {
 
 }
 `;
+
+const code_example_rust = `fn main() {
+    // Print text to the console.
+    println!("Hello World!");
+}`
