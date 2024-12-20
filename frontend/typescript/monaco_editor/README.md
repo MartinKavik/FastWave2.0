@@ -12,4 +12,11 @@ Created with commands:
 - `npm i -E @codemirror/theme-one-dark`
 - `npm i -E @codemirror/language`
 - `npm i -E @codemirror/legacy-modes`
+- `npm i -E @codemirror/view`
+- `npm i -E @codemirror/state`
+- `npm i -E @codemirror/lang-rust`
+- `npm i -E codemirror-languageserver`
+- `npm i -E events`
+- `npm i -D @types/events`
+- `npm i -D @types/node`
 - `npm i -D esbuild typescript@5.5.4`
