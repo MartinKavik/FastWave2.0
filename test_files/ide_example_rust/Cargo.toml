@@ -1,0 +1,10 @@
+[package]
+name = "ide_example_rust"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme.workspace = true
+publish.workspace = true
+
+[dependencies]
