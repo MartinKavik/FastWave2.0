@@ -5,7 +5,8 @@ members = [
     "shared",
     "src-tauri", 
     "test_files/components/rust_decoder",
-    "test_files/components/rust_diagram_connector", "test_files/ide_example_rust",
+    "test_files/components/rust_diagram_connector",
+    "test_files/ide/ide_example_rust",
 ]
 resolver = "2"
 
