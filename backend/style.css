@@ -2,3 +2,7 @@ html {
     /* background-color: DarkSlateBlue; */
     background-color: oklch(41.43% 0.125 262.26);
 }
+
+.cm-editor {
+    min-height: 100%;
+}
