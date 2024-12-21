@@ -6,7 +6,7 @@
 // rustup component add rust-analyzer
 // cargo install --git https://github.com/vivekmalneedi/veridian.git
 // Install lsp-ws-proxy from fork by this command:
-// lsp-ws-proxy -- veridian
+// lsp-ws-proxy -- rust-analyzer -- veridian
 
 import { EditorState, Compartment } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
@@ -25,36 +25,38 @@ export class MonacoEditorController {
     constructor() {}
 
     async init(parent_element: HTMLElement) {
-        const root_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/";
-        const file_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/example.v";
-
-        const ls = languageServer({
-            serverUri: 'ws://localhost:9999',
-            rootUri: `file:///${root_path}`,
-            workspaceFolders: null,
-            documentUri: `file:////${file_path}`,
-            languageId: 'verilog'
-        });
-
-        // const root_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/";
-        // const file_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/src/main.rs";
+        // const root_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/";
+        // const file_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/example.v";
 
         // const ls = languageServer({
-        //     serverUri: 'ws://localhost:9999',
+        //     serverUri: 'ws://localhost:9999?name=veridian',
         //     rootUri: `file:///${root_path}`,
         //     workspaceFolders: null,
         //     documentUri: `file:////${file_path}`,
-        //     languageId: 'rust'
+        //     languageId: 'verilog'
         // });
+
+        const root_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/";
+        const file_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/src/main.rs";
+
+        const ls = languageServer({
+            serverUri: 'ws://localhost:9999?name=rust-analyzer',
+            rootUri: `file:///${root_path}`,
+            workspaceFolders: null,
+            documentUri: `file:////${file_path}`,
+            languageId: 'rust'
+        });
 
         const language = new Compartment()
 
         const state = EditorState.create({
-            doc: code_example_verilog,
+            // doc: code_example_verilog,
+            doc: code_example_rust,
             extensions: [
                 basicSetup,
                 oneDark,
-                language.of(StreamLanguage.define(verilog)),
+                language.of(rust()),
+                // language.of(StreamLanguage.define(verilog)),
                 ls
             ],
         })
