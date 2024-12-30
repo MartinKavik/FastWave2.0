@@ -1,19 +1,19 @@
 use zoon::*;
 
-mod monaco_editor;
-use monaco_editor::MonacoEditor;
-pub use monaco_editor::MonacoEditorController;
+mod code_editor;
+use code_editor::CodeEditor;
+pub use code_editor::CodeEditorController;
 
 #[derive(Clone)]
 pub struct IdePanel {
-    monaco_editor_controller: Mutable<Mutable<Option<SendWrapper<MonacoEditorController>>>>,
+    code_editor_controller: Mutable<Mutable<Option<SendWrapper<CodeEditorController>>>>,
 }
 
 impl IdePanel {
     pub fn new(
-        monaco_editor_controller: Mutable<Mutable<Option<SendWrapper<MonacoEditorController>>>>,
+        code_editor_controller: Mutable<Mutable<Option<SendWrapper<CodeEditorController>>>>,
     ) -> impl Element {
-        Self { monaco_editor_controller }.root()
+        Self { code_editor_controller }.root()
     }
 
     fn root(&self) -> impl Element {
@@ -27,14 +27,14 @@ impl IdePanel {
     }
 
     fn code_editor(&self) -> impl Element {
-        let monaco_editor_controller = self.monaco_editor_controller.clone();
-        MonacoEditor::new()
+        let code_editor_controller = self.code_editor_controller.clone();
+        CodeEditor::new()
             .s(Align::new().top())
             .s(Width::fill())
             .s(Height::fill())
             .s(Scrollbars::both())
             .task_with_controller(move |controller| {
-                monaco_editor_controller.set(controller.clone());
+                code_editor_controller.set(controller.clone());
                 async {}
             })
     }
