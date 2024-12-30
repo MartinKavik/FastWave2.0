@@ -19,7 +19,7 @@ dependencies = [
     "init_pixi_canvas",
     "init_tauri_glue",
     "init_excalidraw_canvas",
-    "init_monaco_editor",
+    "init_code_editor",
 ]
 
 [tasks.start]
@@ -30,7 +30,7 @@ run_task = { fork = true, parallel = true, name = [
     "watch_pixi_canvas",
     "watch_tauri_glue",
     "watch_excalidraw_canvas",
-    "watch_monaco_editor",
+    "watch_code_editor",
 ]}
 
 [tasks.start_browser]
@@ -41,7 +41,7 @@ run_task = { fork = true, parallel = true, name = [
     "watch_pixi_canvas",
     "watch_tauri_glue",
     "watch_excalidraw_canvas",
-    "watch_monaco_editor",
+    "watch_code_editor",
 ]}
 
 [tasks.start_browser_release]
@@ -52,7 +52,7 @@ run_task = { fork = true, parallel = true, name = [
     "watch_pixi_canvas",
     "watch_tauri_glue",
     "watch_excalidraw_canvas",
-    "watch_monaco_editor",
+    "watch_code_editor",
 ]}
 
 [tasks.bundle]
@@ -360,47 +360,47 @@ args = [
 [tasks.watch_typecheck_excalidraw_canvas.windows]
 command = "node_modules/.bin/tsc.cmd"
 
-## monaco_editor ##
+## code_editor ##
 
-[tasks.init_monaco_editor]
-description = "Initialize `frontend/typescript/monaco_editor`"
-cwd = "frontend/typescript/monaco_editor"
+[tasks.init_code_editor]
+description = "Initialize `frontend/typescript/code_editor`"
+cwd = "frontend/typescript/code_editor"
 command = "npm"
 args = ["install"]
 
-[tasks.init_monaco_editor.windows]
+[tasks.init_code_editor.windows]
 command = "npm.cmd"
 
-[tasks.watch_monaco_editor]
+[tasks.watch_code_editor]
 description = "Build and typescheck Typescript on change"
 run_task = { fork = true, parallel = true, name = [
-    "watch_build_monaco_editor",
-    "watch_typecheck_monaco_editor",
+    "watch_build_code_editor",
+    "watch_typecheck_code_editor",
 ]}
 
-[tasks.watch_build_monaco_editor]
-description = "Compile `frontend/typescript/monaco_editor` on change"
-cwd = "frontend/typescript/monaco_editor"
+[tasks.watch_build_code_editor]
+description = "Compile `frontend/typescript/code_editor` on change"
+cwd = "frontend/typescript/code_editor"
 command = "node_modules/.bin/esbuild"
 args = [
-    "monaco_editor.ts",
+    "code_editor.ts",
     "--bundle",
-    "--outfile=../bundles/monaco_editor.js",
+    "--outfile=../bundles/code_editor.js",
     "--format=esm",
     "--minify",
     "--watch",
     "--loader:.ttf=text",
 ]
 
-[tasks.watch_build_monaco_editor.windows]
+[tasks.watch_build_code_editor.windows]
 command = "node_modules/.bin/esbuild.cmd"
 
-[tasks.watch_typecheck_monaco_editor]
-description = "Typecheck `frontend/typescript/monaco_editor` on change"
-cwd = "frontend/typescript/monaco_editor"
+[tasks.watch_typecheck_code_editor]
+description = "Typecheck `frontend/typescript/code_editor` on change"
+cwd = "frontend/typescript/code_editor"
 command = "node_modules/.bin/tsc"
 args = [
-    "monaco_editor.ts",
+    "code_editor.ts",
     "--watch",
     "--noEmit",
     "--preserveWatchOutput",
@@ -410,5 +410,5 @@ args = [
     "--moduleResolution", "bundler",
 ]
 
-[tasks.watch_typecheck_monaco_editor.windows]
+[tasks.watch_typecheck_code_editor.windows]
 command = "node_modules/.bin/tsc.cmd"

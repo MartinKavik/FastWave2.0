@@ -1,32 +1,32 @@
-pub use js_bridge::MonacoEditorController;
+pub use js_bridge::CodeEditorController;
 use zoon::*;
 
-pub struct MonacoEditor {
+pub struct CodeEditor {
     raw_el: RawHtmlEl<web_sys::HtmlElement>,
-    controller: Mutable<Option<SendWrapper<js_bridge::MonacoEditorController>>>,
+    controller: Mutable<Option<SendWrapper<js_bridge::CodeEditorController>>>,
     task_with_controller: Mutable<Option<TaskHandle>>,
 }
 
-impl Element for MonacoEditor {}
+impl Element for CodeEditor {}
 
-impl RawElWrapper for MonacoEditor {
+impl RawElWrapper for CodeEditor {
     type RawEl = RawHtmlEl<web_sys::HtmlElement>;
     fn raw_el_mut(&mut self) -> &mut Self::RawEl {
         &mut self.raw_el
     }
 }
 
-impl Styleable<'_> for MonacoEditor {}
-impl KeyboardEventAware for MonacoEditor {}
-impl MouseEventAware for MonacoEditor {}
-impl PointerEventAware for MonacoEditor {}
-impl TouchEventAware for MonacoEditor {}
-impl AddNearbyElement<'_> for MonacoEditor {}
-impl HasIds for MonacoEditor {}
+impl Styleable<'_> for CodeEditor {}
+impl KeyboardEventAware for CodeEditor {}
+impl MouseEventAware for CodeEditor {}
+impl PointerEventAware for CodeEditor {}
+impl TouchEventAware for CodeEditor {}
+impl AddNearbyElement<'_> for CodeEditor {}
+impl HasIds for CodeEditor {}
 
-impl MonacoEditor {
+impl CodeEditor {
     pub fn new() -> Self {
-        let controller: Mutable<Option<SendWrapper<js_bridge::MonacoEditorController>>> =
+        let controller: Mutable<Option<SendWrapper<js_bridge::CodeEditorController>>> =
             Mutable::new(None);
         let task_with_controller = Mutable::new(None);
         Self {
@@ -37,7 +37,7 @@ impl MonacoEditor {
                 .s(Clip::both())
                 .after_insert(clone!((controller) move |element| {
                     Task::start(async move {
-                        let excalidraw_controller = SendWrapper::new(js_bridge::MonacoEditorController::new());
+                        let excalidraw_controller = SendWrapper::new(js_bridge::CodeEditorController::new());
                         excalidraw_controller.init(&element).await;
                         controller.set(Some(excalidraw_controller));
                     });
@@ -51,7 +51,7 @@ impl MonacoEditor {
 
     pub fn task_with_controller<FUT: Future<Output = ()> + 'static>(
         self,
-        f: impl FnOnce(Mutable<Option<SendWrapper<js_bridge::MonacoEditorController>>>) -> FUT,
+        f: impl FnOnce(Mutable<Option<SendWrapper<js_bridge::CodeEditorController>>>) -> FUT,
     ) -> Self {
         self.task_with_controller
             .set(Some(Task::start_droppable(f(self.controller.clone()))));
@@ -62,29 +62,29 @@ impl MonacoEditor {
 mod js_bridge {
     use zoon::*;
 
-    // Note: Add all corresponding methods to `frontend/typescript/monaco_editor/monaco_editor.tsx`
-    #[wasm_bindgen(module = "/typescript/bundles/monaco_editor.js")]
+    // Note: Add all corresponding methods to `frontend/typescript/code_editor/code_editor.tsx`
+    #[wasm_bindgen(module = "/typescript/bundles/code_editor.js")]
     extern "C" {
         #[derive(Clone)]
-        pub type MonacoEditorController;
+        pub type CodeEditorController;
 
         #[wasm_bindgen(constructor)]
-        pub fn new() -> MonacoEditorController;
+        pub fn new() -> CodeEditorController;
 
         #[wasm_bindgen(method)]
-        pub async fn init(this: &MonacoEditorController, parent_element: &JsValue);
+        pub async fn init(this: &CodeEditorController, parent_element: &JsValue);
 
         // #[wasm_bindgen(method)]
-        // pub fn draw_diagram_element(this: &MonacoEditorController, excalidraw_element: JsValue);
+        // pub fn draw_diagram_element(this: &CodeEditorController, excalidraw_element: JsValue);
 
         // #[wasm_bindgen(method)]
         // pub fn listen_for_component_text_changes(
-        //     this: &MonacoEditorController,
+        //     this: &CodeEditorController,
         //     component_id: &str,
         //     on_change: &Closure<dyn Fn(String)>,
         // );
 
         // #[wasm_bindgen(method)]
-        // pub fn set_component_text(this: &MonacoEditorController, component_id: &str, text: &str);
+        // pub fn set_component_text(this: &CodeEditorController, component_id: &str, text: &str);
     }
 }

@@ -2,12 +2,6 @@
 
 // @TODO Rewrite to Rust? (https://crates.io/crates/codemirror)
 
-// @TODO add to the main README
-// rustup component add rust-analyzer
-// cargo install --git https://github.com/vivekmalneedi/veridian.git
-// Install lsp-ws-proxy from fork by this command:
-// lsp-ws-proxy -- rust-analyzer -- veridian
-
 import { EditorState, Compartment } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
@@ -19,9 +13,7 @@ import { rust } from "@codemirror/lang-rust"
 import { verilog } from "@codemirror/legacy-modes/mode/verilog"
 import { toml } from "@codemirror/legacy-modes/mode/toml"
 
-// @TODO rename `monaco_editor` to code_editor / codemirror
-
-export class MonacoEditorController {
+export class CodeEditorController {
     constructor() {}
 
     async init(parent_element: HTMLElement) {

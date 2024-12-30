@@ -13,7 +13,7 @@ mod diagram_panel;
 use diagram_panel::{DiagramPanel, ExcalidrawController};
 
 mod ide_panel;
-use ide_panel::{IdePanel, MonacoEditorController};
+use ide_panel::{IdePanel, CodeEditorController};
 
 mod waveform_panel;
 use waveform_panel::{PixiController, WaveformPanel};
@@ -56,7 +56,7 @@ struct Store {
     loaded_filename: Mutable<Option<Filename>>,
     pixi_canvas_controller: Mutable<Mutable<Option<SendWrapper<PixiController>>>>,
     excalidraw_canvas_controller: Mutable<Mutable<Option<SendWrapper<ExcalidrawController>>>>,
-    monaco_editor_controller: Mutable<Mutable<Option<SendWrapper<MonacoEditorController>>>>,
+    code_editor_controller: Mutable<Mutable<Option<SendWrapper<CodeEditorController>>>>,
 }
 
 static STORE: Lazy<Store> = lazy::default();
@@ -122,7 +122,7 @@ fn root() -> impl Element {
     let loaded_filename = STORE.loaded_filename.clone();
     let pixi_canvas_controller = STORE.pixi_canvas_controller.clone();
     let excalidraw_canvas_controller = STORE.excalidraw_canvas_controller.clone();
-    let monaco_editor_controller = STORE.monaco_editor_controller.clone();
+    let code_editor_controller = STORE.code_editor_controller.clone();
     Column::new()
         .s(Height::fill())
         .s(Scrollbars::y_and_clip_x())
@@ -195,7 +195,7 @@ fn root() -> impl Element {
                 Column::new()
                     .s(Height::fill())
                     .s(Scrollbars::y_and_clip_x())
-                    .item(IdePanel::new(monaco_editor_controller.clone()))
+                    .item(IdePanel::new(code_editor_controller.clone()))
             }
         })))
         .item(CommandPanel::new())
