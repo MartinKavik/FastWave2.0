@@ -74,6 +74,9 @@ mod js_bridge {
         #[wasm_bindgen(method)]
         pub async fn init(this: &CodeEditorController, parent_element: &JsValue);
 
+        #[wasm_bindgen(method)]
+        pub fn set_selected_file_path(this: &CodeEditorController, path: Option<String>);
+
         // #[wasm_bindgen(method)]
         // pub fn draw_diagram_element(this: &CodeEditorController, excalidraw_element: JsValue);
 

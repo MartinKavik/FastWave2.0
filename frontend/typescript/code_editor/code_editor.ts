@@ -16,6 +16,10 @@ import { toml } from "@codemirror/legacy-modes/mode/toml"
 export class CodeEditorController {
     constructor() {}
 
+    set_selected_file_path(path: string | null) {
+        console.log("set_selected_file_path called!: ", path);
+    }
+
     async init(parent_element: HTMLElement) {
         // const root_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/";
         // const file_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/example.v";
