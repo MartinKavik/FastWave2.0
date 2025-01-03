@@ -126,6 +126,19 @@ pub(super) async fn open_konata_file() {
     tauri_glue::open_konata_file().await;
 }
 
+pub(super) async fn read_file(path: &str) -> Result<String, String> {
+    tauri_glue::read_file(path)
+        .await
+        .map(|content| content.as_string().unwrap_throw())
+        .map_err(|error| {
+            if error.is_string() {
+                error.as_string().unwrap_throw()
+            } else {
+                format!("{error:?}")
+            }
+        })
+}
+
 mod tauri_glue {
     use zoon::*;
 
@@ -188,5 +201,8 @@ mod tauri_glue {
         ) -> Result<(), JsValue>;
 
         pub async fn open_konata_file();
+
+        #[wasm_bindgen(catch)]
+        pub async fn read_file(path: &str) -> Result<JsValue, JsValue>;
     }
 }

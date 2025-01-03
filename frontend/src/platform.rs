@@ -135,3 +135,7 @@ pub async fn notify_diagram_connector_text_change(
 pub async fn open_konata_file() {
     platform::open_konata_file().await;
 }
+
+pub async fn read_file(path: &str) -> Result<String, String> {
+    platform::read_file(path).await
+}

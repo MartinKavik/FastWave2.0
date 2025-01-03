@@ -6,12 +6,11 @@ mod code_editor;
 use code_editor::CodeEditor;
 pub use code_editor::CodeEditorController;
 
-// #[derive(Clone)]
+use crate::platform;
+
 pub struct IdePanel {
     code_editor_controller: Mutable<Mutable<Option<SendWrapper<CodeEditorController>>>>,
     selected_file_path: Mutable<Option<PathBuf>>,
-    #[allow(dead_code)]
-    selected_file_path_change_handler: TaskHandle,
 }
 
 impl IdePanel {
@@ -21,22 +20,34 @@ impl IdePanel {
         let selected_file_path = Mutable::new(None::<PathBuf>);
 
         let selected_file_path_change_handler = Task::start_droppable(
-            selected_file_path.signal_cloned().for_each_sync(clone!((code_editor_controller) move |path| {
-                let path = path.map(|path| path.into_os_string().into_string().unwrap_throw());
-                if let Some(controller) = code_editor_controller.lock_ref().lock_ref().as_ref() {
-                    controller.set_selected_file_path(path);
-                }
+            selected_file_path.signal_cloned().for_each(clone!((code_editor_controller) move |path| {
+                clone!((code_editor_controller) async move {
+                    let path = path.map(|path| path.into_os_string().into_string().unwrap_throw());
+                    if let Some(controller) = code_editor_controller.lock_ref().lock_ref().as_ref() {
+                        let content = if let Some(path) = &path {
+                            match platform::read_file(path).await {
+                                Ok(content) => content,
+                                Err(error) => { 
+                                    zoon::eprintln!("Failed to load file '{path}': {error:#}");
+                                    String::new()
+                                }
+                            }
+                        } else {
+                            String::new()
+                        };
+                        controller.set_selected_file(path, content);
+                    }
+                })
             }))
         );
 
         Self { 
             code_editor_controller,
             selected_file_path,
-            selected_file_path_change_handler,
-        }.root()
+        }.root(selected_file_path_change_handler)
     }
 
-    fn root(&self) -> impl Element {
+    fn root(&self, selected_file_path_change_handler: TaskHandle) -> impl Element {
         Column::new()
             .s(Padding::all(20))
             .s(Scrollbars::y_and_clip_x())
@@ -45,6 +56,9 @@ impl IdePanel {
             .s(Gap::new().y(20))
             .item(self.file_path_input())
             .item(self.code_editor())
+            .after_remove(move |_| {
+                drop(selected_file_path_change_handler)
+            })
     }
 
     fn file_path_input(&self) -> impl Element {

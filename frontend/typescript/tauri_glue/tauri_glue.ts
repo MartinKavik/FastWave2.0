@@ -94,3 +94,7 @@ export async function notify_diagram_connector_text_change(diagram_connector: Di
 export async function open_konata_file() {
     return await invoke("open_konata_file");
 }
+
+export async function read_file(path: string): Promise<string> {
+    return await invoke("read_file", { path });
+}

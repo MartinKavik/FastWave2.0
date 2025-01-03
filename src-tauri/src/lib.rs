@@ -6,6 +6,7 @@ use std::time::Duration;
 use tauri::{async_runtime::RwLock, AppHandle};
 use tauri_plugin_dialog::DialogExt;
 use tokio::time::sleep;
+use tokio::fs::read_to_string;
 use wasmtime::AsContextMut;
 use wellen::simple::Waveform;
 use tauri::Emitter;
@@ -283,6 +284,11 @@ fn spawn_konata_app() {
         .unwrap();
 }
 
+#[tauri::command(rename_all = "snake_case")]
+async fn read_file(path: String) -> Result<String, String> {
+    read_to_string(path).await.map_err(|error| error.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // https://github.com/tauri-apps/tauri/issues/8462
@@ -308,6 +314,7 @@ pub fn run() {
             remove_all_diagram_connectors,
             notify_diagram_connector_text_change,
             open_konata_file,
+            read_file,
         ])
         .setup(|app| {
             *APP_HANDLE.write().unwrap() = Some(app.handle().to_owned());
