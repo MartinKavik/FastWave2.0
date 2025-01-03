@@ -75,19 +75,6 @@ mod js_bridge {
         pub async fn init(this: &CodeEditorController, parent_element: &JsValue);
 
         #[wasm_bindgen(method)]
-        pub fn set_selected_file_path(this: &CodeEditorController, path: Option<String>);
-
-        // #[wasm_bindgen(method)]
-        // pub fn draw_diagram_element(this: &CodeEditorController, excalidraw_element: JsValue);
-
-        // #[wasm_bindgen(method)]
-        // pub fn listen_for_component_text_changes(
-        //     this: &CodeEditorController,
-        //     component_id: &str,
-        //     on_change: &Closure<dyn Fn(String)>,
-        // );
-
-        // #[wasm_bindgen(method)]
-        // pub fn set_component_text(this: &CodeEditorController, component_id: &str, text: &str);
+        pub fn set_selected_file(this: &CodeEditorController, path: Option<String>, content: String);
     }
 }

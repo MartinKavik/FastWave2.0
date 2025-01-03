@@ -16,8 +16,8 @@ import { toml } from "@codemirror/legacy-modes/mode/toml"
 export class CodeEditorController {
     constructor() {}
 
-    set_selected_file_path(path: string | null) {
-        console.log("set_selected_file_path called!: ", path);
+    set_selected_file(path: string | null, content: string) {
+        console.log("set_selected_file_path called!: ", path, content);
     }
 
     async init(parent_element: HTMLElement) {
@@ -37,7 +37,8 @@ export class CodeEditorController {
 
         const ls = languageServer({
             serverUri: 'ws://localhost:9999?name=rust-analyzer',
-            rootUri: `file:///${root_path}`,
+            // rootUri: `file:///${root_path}`,
+            rootUri: null,
             workspaceFolders: null,
             documentUri: `file:////${file_path}`,
             languageId: 'rust'
