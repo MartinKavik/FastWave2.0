@@ -73,7 +73,6 @@ impl IdePanel {
                 event.if_key(Key::Enter, || {
                     let input_file_path = PathBuf::from_str(&input_file_path.lock_ref()).unwrap_throw();
                     selected_file_path.set(Some(input_file_path));
-                    zoon::println!("New path set!");
                 });
             })
     }

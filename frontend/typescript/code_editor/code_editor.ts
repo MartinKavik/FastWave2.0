@@ -13,26 +13,61 @@ import { rust } from "@codemirror/lang-rust"
 import { verilog } from "@codemirror/legacy-modes/mode/verilog"
 import { toml } from "@codemirror/legacy-modes/mode/toml"
 
+type LanguageServerConfig = {
+    name: string
+    file_path: string
+    language: string
+}
+
+function create_language_server(config: LanguageServerConfig) {
+    return languageServer({
+        serverUri: `ws://localhost:9999?name=${config.name}`,
+        rootUri: null,
+        workspaceFolders: null,
+        documentUri: `file:////${config.file_path}`,
+        languageId: config.language
+    });
+}
+
 export class CodeEditorController {
     constructor() {}
 
     editor_view: EditorView | null = null
     programming_language = new Compartment()
+    language_server = new Compartment()
+    file_content = new Compartment()
 
     set_selected_file(path: string | null, content: string) {
-        console.log("set_selected_file_path called!");
-        console.log("selected path: ", path);
-        console.log("selected content: ", content);
+        console.log("Selected file: ", path);
+
+        this.editor_view!.dispatch({
+            changes: [
+                { from: 0, to: this.editor_view!.state.doc.length },
+                { from: 0, insert: content },
+            ]
+        })
 
         if (typeof(path) === 'string') {
             let new_language: Extension | null = null;
+            let new_language_server_config: LanguageServerConfig | null = null;
 
             if (path.endsWith(".rs")) {
                 new_language = rust();
+                new_language_server_config = {
+                    name: 'rust-analyzer',
+                    file_path: path,
+                    language: 'rust',
+                };
             } else if (path.endsWith(".v") || path.endsWith(".sv")) {
                 new_language = StreamLanguage.define(verilog);
+                new_language_server_config = {
+                    name: 'veridian',
+                    file_path: path,
+                    language: 'verilog',
+                };
             } else if (path.endsWith(".toml")) {
                 new_language = StreamLanguage.define(toml);
+                new_language_server_config = null;
             } else {
                 console.error(`This file extension is not supported: '${path}'`)
             }
@@ -41,42 +76,32 @@ export class CodeEditorController {
                 this.editor_view!.dispatch({
                     effects: this.programming_language.reconfigure(new_language)
                 })
+            } else {
+                this.editor_view!.dispatch({
+                    effects: this.programming_language.reconfigure([])
+                })
+            }
+
+            if (new_language_server_config !== null) {
+                const new_language_server = create_language_server(new_language_server_config);
+                this.editor_view!.dispatch({
+                    effects: this.language_server.reconfigure(new_language_server)
+                })
+            } else {
+                this.editor_view!.dispatch({
+                    effects: this.language_server.reconfigure([])
+                })
             }
         }
     }
 
     async init(parent_element: HTMLElement) {
-        // const root_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/";
-        // const file_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/example.v";
-
-        // const ls = languageServer({
-        //     serverUri: 'ws://localhost:9999?name=veridian',
-        //     rootUri: `file:///${root_path}`,
-        //     workspaceFolders: null,
-        //     documentUri: `file:////${file_path}`,
-        //     languageId: 'verilog'
-        // });
-
-        const root_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/";
-        const file_path = "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/src/main.rs";
-
-        const ls = languageServer({
-            serverUri: 'ws://localhost:9999?name=rust-analyzer',
-            // rootUri: `file:///${root_path}`,
-            rootUri: null,
-            workspaceFolders: null,
-            documentUri: `file:////${file_path}`,
-            languageId: 'rust'
-        });
-
         const state = EditorState.create({
-            // doc: code_example_verilog,
-            doc: code_example_rust,
             extensions: [
                 basicSetup,
                 oneDark,
-                this.programming_language.of(StreamLanguage.define(verilog)),
-                ls
+                this.programming_language.of([]),
+                this.language_server.of([])
             ],
         })
 
@@ -84,69 +109,5 @@ export class CodeEditorController {
             parent: parent_element,
             state
         });
-
-        // // @TODO remove
-        // view.dispatch({
-        //     changes: [
-        //         { from: 0, to: view.state.doc.length },
-        //         { from: 0, insert: code_example_scala },
-        //     ]
-        // })
-
-        // // @TODO remove
-        // console.log("CONTENT: ", view.state.doc.toString())
     }
 }
-
-const code_example_verilog = `include "first_counter.v"
-module first_counter_tb();
-// Declare inputs as regs and outputs as wires
-reg clock, reset, enable;
-wire [3:0] counter_out;
-
-// Initialize all variables
-initial begin
-  $display ("time\\t clk reset enable counter");
-  $monitor ("%g\\t %b   %b     %b      %b",
-	  $time, clock, reset, enable, counter_out);
-  clock = 1;       // initial value of clock
-  reset = 0;       // initial value of reset
-  enable = 0;      // initial value of enable
-   #5  reset = 1;    // Assert the reset
-   #10  reset = 0;   // De-assert the reset
-   #10  enable = 1;  // Assert enable
-   #100  enable = 0; // De-assert enable
-   #5  $finish;      // Terminate simulation
-end
-
-// Clock generator
-always begin
-   #5  clock = ~clock; // Toggle clock every 5 ticks
-end
-
-// Connect DUT to test bench
-first_counter U_counter (
-clock,
-reset,
-enable,
-counter_out
-);
-
-endmodule
-`;
-
-const code_example_rust = `fn main() {
-    // Print text to the console.
-    println!("Hello World!");
-}`
-
-const code_example_toml = `[package]
-name = "ide_example_rust"
-version.workspace = true
-edition.workspace = true
-repository.workspace = true
-authors.workspace = true
-readme.workspace = true
-publish.workspace = true
-
-[dependencies]`

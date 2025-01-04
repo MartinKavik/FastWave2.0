@@ -151,7 +151,7 @@ See `test_files/components/[language]_decoder/README.md`
 
 ---
 
-### Install LSP servers (Rust and SystemVerilo/Verilog)
+### Install LSP servers (Rust and SystemVerilog/Verilog)
 
 1. `rustup component add rust-analyzer`
 2. `cargo install --git https://github.com/vivekmalneedi/veridian.git`
