@@ -2,7 +2,7 @@
 
 // @TODO Rewrite to Rust? (https://crates.io/crates/codemirror)
 
-import { EditorState, Compartment } from '@codemirror/state'
+import { EditorState, Compartment, Extension } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
@@ -16,8 +16,33 @@ import { toml } from "@codemirror/legacy-modes/mode/toml"
 export class CodeEditorController {
     constructor() {}
 
+    editor_view: EditorView | null = null
+    programming_language = new Compartment()
+
     set_selected_file(path: string | null, content: string) {
-        console.log("set_selected_file_path called!: ", path, content);
+        console.log("set_selected_file_path called!");
+        console.log("selected path: ", path);
+        console.log("selected content: ", content);
+
+        if (typeof(path) === 'string') {
+            let new_language: Extension | null = null;
+
+            if (path.endsWith(".rs")) {
+                new_language = rust();
+            } else if (path.endsWith(".v") || path.endsWith(".sv")) {
+                new_language = StreamLanguage.define(verilog);
+            } else if (path.endsWith(".toml")) {
+                new_language = StreamLanguage.define(toml);
+            } else {
+                console.error(`This file extension is not supported: '${path}'`)
+            }
+
+            if (new_language !== null) {
+                this.editor_view!.dispatch({
+                    effects: this.programming_language.reconfigure(new_language)
+                })
+            }
+        }
     }
 
     async init(parent_element: HTMLElement) {
@@ -44,48 +69,27 @@ export class CodeEditorController {
             languageId: 'rust'
         });
 
-        const language = new Compartment()
-
         const state = EditorState.create({
             // doc: code_example_verilog,
             doc: code_example_rust,
             extensions: [
                 basicSetup,
                 oneDark,
-                language.of(rust()),
-                // language.of(StreamLanguage.define(verilog)),
+                this.programming_language.of(StreamLanguage.define(verilog)),
                 ls
             ],
         })
 
-        const view = new EditorView({
+        this.editor_view = new EditorView({
             parent: parent_element,
             state
-        })
-
-        // // @TODO remove
-        // view.dispatch({
-        //     effects: language.reconfigure(StreamLanguage.define(scala))
-        // })
+        });
 
         // // @TODO remove
         // view.dispatch({
         //     changes: [
         //         { from: 0, to: view.state.doc.length },
         //         { from: 0, insert: code_example_scala },
-        //     ]
-        // })
-
-        // // @TODO remove
-        // view.dispatch({
-        //     effects: language.reconfigure(rust())
-        // })
-
-        // // @TODO remove
-        // view.dispatch({
-        //     changes: [
-        //         { from: 0, to: view.state.doc.length },
-        //         { from: 0, insert: code_example_rust },
         //     ]
         // })
 
