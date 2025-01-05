@@ -33,7 +33,7 @@ impl CodeEditor {
             controller: controller.clone(),
             task_with_controller: task_with_controller.clone(),
             raw_el: El::new()
-                .s(RoundedCorners::all(10))
+                .s(RoundedCorners::new().bottom(10))
                 .s(Clip::both())
                 .after_insert(clone!((controller) move |element| {
                     Task::start(async move {

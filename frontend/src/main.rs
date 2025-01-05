@@ -1,6 +1,6 @@
 use shared::DiagramConnectorMessage;
 use term::TERM_OPEN;
-use std::{mem, sync::Arc};
+use std::{mem, path::PathBuf, sync::Arc};
 use zoon::*;
 
 mod platform;
@@ -57,6 +57,7 @@ struct Store {
     pixi_canvas_controller: Mutable<Mutable<Option<SendWrapper<PixiController>>>>,
     excalidraw_canvas_controller: Mutable<Mutable<Option<SendWrapper<ExcalidrawController>>>>,
     code_editor_controller: Mutable<Mutable<Option<SendWrapper<CodeEditorController>>>>,
+    selected_code_editor_folder_path: Mutable<Option<PathBuf>>,
 }
 
 static STORE: Lazy<Store> = lazy::default();
@@ -123,6 +124,7 @@ fn root() -> impl Element {
     let pixi_canvas_controller = STORE.pixi_canvas_controller.clone();
     let excalidraw_canvas_controller = STORE.excalidraw_canvas_controller.clone();
     let code_editor_controller = STORE.code_editor_controller.clone();
+    let selected_code_editor_folder_path = STORE.selected_code_editor_folder_path.clone();
     Column::new()
         .s(Height::fill())
         .s(Scrollbars::y_and_clip_x())
@@ -195,7 +197,7 @@ fn root() -> impl Element {
                 Column::new()
                     .s(Height::fill())
                     .s(Scrollbars::y_and_clip_x())
-                    .item(IdePanel::new(code_editor_controller.clone()))
+                    .item(IdePanel::new(code_editor_controller.clone(), selected_code_editor_folder_path.clone()))
             }
         })))
         .item(CommandPanel::new())
