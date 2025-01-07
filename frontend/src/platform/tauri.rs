@@ -139,6 +139,13 @@ pub(super) async fn read_file(path: &str) -> Result<String, String> {
         })
 }
 
+pub(super) async fn select_folder_to_open() -> Option<super::FolderPath> {
+    tauri_glue::select_folder_to_open()
+        .await
+        .unwrap_throw()
+        .as_string()
+}
+
 mod tauri_glue {
     use zoon::*;
 
@@ -204,5 +211,8 @@ mod tauri_glue {
 
         #[wasm_bindgen(catch)]
         pub async fn read_file(path: &str) -> Result<JsValue, JsValue>;
+
+        #[wasm_bindgen(catch)]
+        pub async fn select_folder_to_open() -> Result<JsValue, JsValue>;
     }
 }

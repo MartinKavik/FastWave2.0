@@ -17,6 +17,7 @@ mod browser;
 use browser as platform;
 
 type Filename = String;
+type FolderPath = String;
 type JavascriptCode = String;
 
 type AddedDecodersCount = usize;
@@ -139,3 +140,8 @@ pub async fn open_konata_file() {
 pub async fn read_file(path: &str) -> Result<String, String> {
     platform::read_file(path).await
 }
+
+pub async fn select_folder_to_open() -> Option<FolderPath> {
+    platform::select_folder_to_open().await
+}
+

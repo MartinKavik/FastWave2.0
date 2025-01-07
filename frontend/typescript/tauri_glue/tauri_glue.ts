@@ -6,6 +6,7 @@ const invoke = core.invoke;
 const listen = event.listen;
 
 type Filename = string;
+type FolderPath = string;
 type JavascriptCode = string;
 type WellenHierarchy = unknown;
 type Timeline = unknown;
@@ -97,4 +98,8 @@ export async function open_konata_file() {
 
 export async function read_file(path: string): Promise<string> {
     return await invoke("read_file", { path });
+}
+
+export async function select_folder_to_open(): Promise<FolderPath | undefined> {
+    return await invoke("select_folder_to_open");
 }

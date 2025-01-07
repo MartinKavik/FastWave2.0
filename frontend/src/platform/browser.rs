@@ -177,3 +177,9 @@ pub async fn read_file(path: &str) -> Result<String, String> {
     eprintln!("Reading files is not supported in the browser.");
     Err(String::from("Reading files is not supported in the browser."))
 }
+
+pub(super) async fn select_folder_to_open() -> Option<super::FolderPath> {
+    // @TODO error message for user
+    eprintln!("Opening folders is not supported in the browser.");
+    None
+}

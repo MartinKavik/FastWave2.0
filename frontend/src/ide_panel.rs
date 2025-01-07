@@ -8,6 +8,27 @@ pub use code_editor::CodeEditorController;
 
 use crate::platform;
 
+#[derive(Debug)]
+enum FileTreeItem {
+    Folder { 
+        name: String, 
+        #[allow(dead_code)]
+        path: PathBuf, 
+        children: Vec<FileTreeItem> 
+    },
+    File { name: String, path: PathBuf }
+}
+
+impl FileTreeItem {
+    pub fn new_folder(path: PathBuf, children: Vec<FileTreeItem>) -> Self {
+        Self::Folder { name: path.file_name().unwrap().to_string_lossy().to_string(), path, children }
+    }
+
+    pub fn new_file(path: PathBuf) -> Self {
+        Self::File { name: path.file_name().unwrap().to_string_lossy().to_string(), path }
+    }
+}
+
 pub struct IdePanel {
     code_editor_controller: Mutable<Mutable<Option<SendWrapper<CodeEditorController>>>>,
     selected_file_path: Mutable<Option<PathBuf>>,
@@ -57,7 +78,16 @@ impl IdePanel {
             .s(Width::fill())
             .s(Height::fill())
             .s(Gap::new().y(20))
-            .item(self.file_tree_view())
+            .item(
+                Column::new()
+                    .s(Align::new().top())
+                    .s(Scrollbars::y_and_clip_x())
+                    .s(Width::exact(300))
+                    .s(Padding::new().right(20))
+                    .s(Gap::new().y(10))
+                    .item(self.open_folder_button())
+                    .item(self.file_tree_view())
+            )
             .item(
                 Column::new()
                     .s(Scrollbars::y_and_clip_x())
@@ -115,9 +145,6 @@ impl IdePanel {
         zoon::println!("{test_root:#?}");
 
         El::new()
-            .s(Align::new().top())
-            .s(Width::exact(300))
-            .s(Padding::new().right(20))
             .child(self.file_tree_view_item(test_root))
     }
 
@@ -126,7 +153,7 @@ impl IdePanel {
         let top_padding = 5;
         let inner_padding = Padding::new().x(10).y(3);
         match item {
-            FileTreeItem::Folder { name, path, children } => {
+            FileTreeItem::Folder { name, path: _, children } => {
                 Column::with_tag(Tag::Custom("details"))
                     .s(Padding::new().left(left_padding).top(top_padding))
                     .s(Width::fill())
@@ -184,20 +211,27 @@ impl IdePanel {
                 async {}
             })
     }
-}
 
-#[derive(Debug)]
-enum FileTreeItem {
-    Folder { name: String, path: PathBuf, children: Vec<FileTreeItem> },
-    File { name: String, path: PathBuf }
-}
-
-impl FileTreeItem {
-    pub fn new_folder(path: PathBuf, children: Vec<FileTreeItem>) -> Self {
-        Self::Folder { name: path.file_name().unwrap().to_string_lossy().to_string(), path, children }
-    }
-
-    pub fn new_file(path: PathBuf) -> Self {
-        Self::File { name: path.file_name().unwrap().to_string_lossy().to_string(), path }
+    #[cfg(FASTWAVE_PLATFORM = "TAURI")]
+    fn open_folder_button(&self) -> impl Element {
+        let (hovered, hovered_signal) = Mutable::new_and_signal(false);
+        let selected_folder_path = self.selected_folder_path.clone();
+        Button::new()
+            .s(Padding::new().x(20).y(4))
+            .s(Background::new().color_signal(
+                hovered_signal.map_bool(|| COLOR_MEDIUM_SLATE_BLUE, || COLOR_SLATE_BLUE),
+            ))
+            .s(Align::new().center_x())
+            .s(RoundedCorners::all(10))
+            .label(El::new().s(Font::new().no_wrap()).child("Open folder.."))
+            .on_hovered_change(move |is_hovered| hovered.set_neq(is_hovered))
+            .on_press(move || {
+                let selected_folder_path = selected_folder_path.clone();
+                Task::start(async move {
+                    if let Some(folder_path) = platform::select_folder_to_open().await {
+                        selected_folder_path.set_neq(Some(folder_path.into()));
+                    }
+                })
+            })
     }
 }
