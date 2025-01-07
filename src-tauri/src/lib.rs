@@ -12,6 +12,7 @@ use wellen::simple::Waveform;
 use tauri::Emitter;
 
 type Filename = String;
+type FolderPath = String;
 type JavascriptCode = String;
 
 type AddedDecodersCount = usize;
@@ -289,6 +290,18 @@ async fn read_file(path: String) -> Result<String, String> {
     read_to_string(path).await.map_err(|error| error.to_string())
 }
 
+#[tauri::command(rename_all = "snake_case")]
+async fn select_folder_to_open(
+    app: tauri::AppHandle,
+) -> Result<Option<FolderPath>, ()> {
+    let Some(file_path) = app.dialog().file().blocking_pick_folder() else {
+        return Ok(None);
+    };
+    let path_buf = file_path.into_path().unwrap();
+    let folder_path = path_buf.as_os_str().to_str().unwrap();
+    Ok(Some(folder_path.to_owned()))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // https://github.com/tauri-apps/tauri/issues/8462
@@ -315,6 +328,7 @@ pub fn run() {
             notify_diagram_connector_text_change,
             open_konata_file,
             read_file,
+            select_folder_to_open,
         ])
         .setup(|app| {
             *APP_HANDLE.write().unwrap() = Some(app.handle().to_owned());
