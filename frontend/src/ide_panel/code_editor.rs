@@ -75,6 +75,10 @@ mod js_bridge {
         pub async fn init(this: &CodeEditorController, parent_element: &JsValue);
 
         #[wasm_bindgen(method)]
-        pub fn set_selected_file(this: &CodeEditorController, path: Option<String>, content: String);
+        pub fn set_selected_file(
+            this: &CodeEditorController,
+            path: Option<String>,
+            content: String,
+        );
     }
 }

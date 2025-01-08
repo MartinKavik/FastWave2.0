@@ -1,6 +1,6 @@
+use crate::theme::*;
 use std::path::PathBuf;
 use zoon::*;
-use crate::theme::*;
 
 mod code_editor;
 use code_editor::CodeEditor;
@@ -30,7 +30,7 @@ impl IdePanel {
                         let content = if let Some(path) = &path {
                             match platform::read_file(path).await {
                                 Ok(content) => content,
-                                Err(error) => { 
+                                Err(error) => {
                                     zoon::eprintln!("Failed to load file '{path}': {error:#}");
                                     String::new()
                                 }
@@ -44,11 +44,12 @@ impl IdePanel {
             }))
         );
 
-        Self { 
+        Self {
             code_editor_controller,
             selected_file_path,
             selected_folder_path,
-        }.root(selected_file_path_change_handler)
+        }
+        .root(selected_file_path_change_handler)
     }
 
     fn root(&self, selected_file_path_change_handler: TaskHandle) -> impl Element {
@@ -66,7 +67,7 @@ impl IdePanel {
                     .s(Padding::new().right(20))
                     .s(Gap::new().y(10))
                     .item(self.open_folder_button())
-                    .item(self.file_tree_view())
+                    .item(self.file_tree_view()),
             )
             .item(
                 Column::new()
@@ -74,11 +75,9 @@ impl IdePanel {
                     .s(Width::fill())
                     .s(Height::fill())
                     .item(self.file_path_input())
-                    .item(self.code_editor())
+                    .item(self.code_editor()),
             )
-            .after_remove(move |_| {
-                drop(selected_file_path_change_handler)
-            })
+            .after_remove(move |_| drop(selected_file_path_change_handler))
     }
 
     fn file_path_input(&self) -> impl Element {
@@ -89,27 +88,31 @@ impl IdePanel {
             .s(Font::default().color(COLOR_LIGHT_BLUE))
             .label_hidden("selected file path")
             .text_signal(
-                self
-                    .selected_file_path
+                self.selected_file_path
                     .signal_cloned()
-                    .map_option(|path| path.to_string_lossy().to_string(), String::new)
+                    .map_option(|path| path.to_string_lossy().to_string(), String::new),
             )
             .read_only(true)
     }
 
     fn file_tree_view(&self) -> impl Element {
         let this = self.clone();
-        El::new().child_signal(self.selected_folder_path.signal_cloned().map_future(move |folder_path| {
-            let this = this.clone();
-            async move {
-                let Some(folder_path) = folder_path else { return None }; 
-
-                let root = platform::file_tree(folder_path).await;
-        
-                zoon::println!("{root:#?} (in Browser, from Tauri");
-                Some(this.file_tree_view_item(root))
-            }
-        }).boxed_local().map(Option::flatten))
+        El::new().child_signal(
+            self.selected_folder_path
+                .signal_cloned()
+                .map_future(move |folder_path| {
+                    let this = this.clone();
+                    async move {
+                        let Some(folder_path) = folder_path else {
+                            return None;
+                        };
+                        let root = platform::file_tree(folder_path).await;
+                        Some(this.file_tree_view_item(root))
+                    }
+                })
+                .boxed_local()
+                .map(Option::flatten),
+        )
     }
 
     fn file_tree_view_item(&self, item: shared::FileTreeItem) -> impl Element {
@@ -117,31 +120,35 @@ impl IdePanel {
         let top_padding = 5;
         let inner_padding = Padding::new().x(10).y(3);
         match item {
-            shared::FileTreeItem::Folder { name, path: _, children } => {
-                Column::with_tag(Tag::Custom("details"))
-                    .s(Padding::new().left(left_padding).top(top_padding))
-                    .s(Width::fill())
-                    .s(Cursor::new(CursorIcon::Pointer))
-                    .item(
-                        El::with_tag(Tag::Custom("summary"))
-                            .update_raw_el(|raw_el| {
-                                raw_el.style("display", "list-item")
-                            })
-                            .s(inner_padding)
-                            .child(name)
-                    )
-                    .items(children.into_iter().map(|item| {
-                        self.file_tree_view_item(item).unify()
-                    }))
-                    .left_either()
-            }
+            shared::FileTreeItem::Folder {
+                name,
+                path: _,
+                children,
+            } => Column::with_tag(Tag::Custom("details"))
+                .s(Padding::new().left(left_padding).top(top_padding))
+                .s(Width::fill())
+                .s(Cursor::new(CursorIcon::Pointer))
+                .item(
+                    El::with_tag(Tag::Custom("summary"))
+                        .update_raw_el(|raw_el| raw_el.style("display", "list-item"))
+                        .s(inner_padding)
+                        .child(name),
+                )
+                .items(
+                    children
+                        .into_iter()
+                        .map(|item| self.file_tree_view_item(item).unify()),
+                )
+                .left_either(),
             shared::FileTreeItem::File { name, path } => {
-                let is_selected = self.selected_file_path.signal_ref(clone!((path) move |selected_path| {
-                    if let Some(selected_path) = selected_path.as_ref() {
-                        return selected_path == &path
-                    }
-                    false
-                }));
+                let is_selected =
+                    self.selected_file_path
+                        .signal_ref(clone!((path) move |selected_path| {
+                            if let Some(selected_path) = selected_path.as_ref() {
+                                return selected_path == &path
+                            }
+                            false
+                        }));
                 let selected_file_path = self.selected_file_path.clone();
                 El::new()
                     .s(Padding::new().left(left_padding).top(top_padding))
@@ -151,12 +158,13 @@ impl IdePanel {
                         El::new()
                             .s(inner_padding)
                             .s(RoundedCorners::all(10))
-                            .s(Background::new().color_signal(is_selected.map_true(|| COLOR_SLATE_BLUE_WITH_ALPHA)))
+                            .s(Background::new()
+                                .color_signal(is_selected.map_true(|| COLOR_SLATE_BLUE_WITH_ALPHA)))
                             .s(Width::default())
                             .on_click(move || {
                                 selected_file_path.set_neq(Some(path.clone()));
                             })
-                            .child(name)
+                            .child(name),
                     )
                     .right_either()
             }

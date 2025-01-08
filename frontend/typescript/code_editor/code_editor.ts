@@ -38,8 +38,6 @@ export class CodeEditorController {
     file_content = new Compartment()
 
     set_selected_file(path: string | null, content: string) {
-        console.log("Selected file: ", path);
-
         this.editor_view!.dispatch({
             changes: [
                 { from: 0, to: this.editor_view!.state.doc.length },

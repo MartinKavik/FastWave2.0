@@ -6,8 +6,8 @@ use std::sync::{Arc, RwLock as StdRwLock};
 use std::time::Duration;
 use tauri::{async_runtime::RwLock, AppHandle};
 use tauri_plugin_dialog::DialogExt;
-use tokio::time::sleep;
 use tokio::fs::read_to_string;
+use tokio::time::sleep;
 use wasmtime::AsContextMut;
 use wellen::simple::Waveform;
 use tauri::Emitter;
@@ -288,13 +288,13 @@ fn spawn_konata_app() {
 
 #[tauri::command(rename_all = "snake_case")]
 async fn read_file(path: String) -> Result<String, String> {
-    read_to_string(path).await.map_err(|error| error.to_string())
+    read_to_string(path)
+        .await
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command(rename_all = "snake_case")]
-async fn select_folder_to_open(
-    app: tauri::AppHandle,
-) -> Result<Option<FolderPath>, ()> {
+async fn select_folder_to_open(app: tauri::AppHandle) -> Result<Option<FolderPath>, ()> {
     let Some(file_path) = app.dialog().file().blocking_pick_folder() else {
         return Ok(None);
     };
@@ -306,7 +306,6 @@ async fn select_folder_to_open(
 #[tauri::command(rename_all = "snake_case")]
 async fn file_tree(path: FolderPath) -> Result<shared::FileTreeItem, ()> {
     let root = file_tree_item(path.into());
-    println!("{root:#?} (in Tauri)");
     Ok(root)
 }
 
@@ -315,9 +314,9 @@ fn file_tree_item(path: PathBuf) -> shared::FileTreeItem {
     if metadata.is_file() {
         shared::FileTreeItem::new_file(path)
     } else {
-        let children = fs::read_dir(&path).unwrap().map(|entry| {
-            file_tree_item(entry.unwrap().path())
-        });
+        let children = fs::read_dir(&path)
+            .unwrap()
+            .map(|entry| file_tree_item(entry.unwrap().path()));
         shared::FileTreeItem::new_folder(path, children.collect())
     }
 }
