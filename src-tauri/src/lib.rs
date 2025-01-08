@@ -1,5 +1,6 @@
 use once_cell::sync::Lazy;
 use std::fs;
+use std::path::PathBuf;
 use std::process::Command;
 use std::sync::{Arc, RwLock as StdRwLock};
 use std::time::Duration;
@@ -304,32 +305,21 @@ async fn select_folder_to_open(
 
 #[tauri::command(rename_all = "snake_case")]
 async fn file_tree(path: FolderPath) -> Result<shared::FileTreeItem, ()> {
-    let root = shared::FileTreeItem::new_folder(
-        "D:/repos/FastWave2.0/test_files/ide".into(),
-        vec![
-            shared::FileTreeItem::new_folder(
-                "D:/repos/FastWave2.0/test_files/ide/ide_example_rust".into(),
-                vec![
-                    shared::FileTreeItem::new_folder(
-                        "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/src".into(),
-                        vec![
-                            shared::FileTreeItem::new_file("D:/repos/FastWave2.0/test_files/ide/ide_example_rust/src/main.rs".into())
-                        ]
-                    ),
-                    shared::FileTreeItem::new_file("D:/repos/FastWave2.0/test_files/ide/ide_example_rust/Cargo.toml".into())
-                ]
-            ),
-            shared::FileTreeItem::new_folder(
-                "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog".into(),
-                vec![
-                    shared::FileTreeItem::new_file("D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/example.v".into())
-                ]
-            )
-        ]
-    );
-    
+    let root = file_tree_item(path.into());
     println!("{root:#?} (in Tauri)");
     Ok(root)
+}
+
+fn file_tree_item(path: PathBuf) -> shared::FileTreeItem {
+    let metadata = fs::metadata(path.clone()).unwrap();
+    if metadata.is_file() {
+        shared::FileTreeItem::new_file(path)
+    } else {
+        let children = fs::read_dir(&path).unwrap().map(|entry| {
+            file_tree_item(entry.unwrap().path())
+        });
+        shared::FileTreeItem::new_folder(path, children.collect())
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
