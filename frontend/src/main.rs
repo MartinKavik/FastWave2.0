@@ -1,6 +1,6 @@
 use shared::DiagramConnectorMessage;
-use term::TERM_OPEN;
 use std::{mem, path::PathBuf, sync::Arc};
+use term::TERM_OPEN;
 use zoon::*;
 
 mod platform;
@@ -108,10 +108,12 @@ fn main() {
                     .unwrap_throw()
                     .set_component_text(&component_id, &text),
             }
-        }).await;
+        })
+        .await;
         platform::listen_term_update(|down_msg| {
             term::TERMINAL_STATE.set(down_msg);
-        }).await;
+        })
+        .await;
     });
 }
 

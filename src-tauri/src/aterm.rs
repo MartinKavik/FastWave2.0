@@ -4,11 +4,11 @@ use std::sync::{mpsc, Arc};
 use alacritty_terminal::event::{Event, EventListener};
 use alacritty_terminal::event_loop::{EventLoop, Notifier};
 use alacritty_terminal::sync::FairMutex;
-use alacritty_terminal::term::{self, Term};
 use alacritty_terminal::term::cell::Cell;
+use alacritty_terminal::term::{self, Term};
 use alacritty_terminal::{tty, Grid};
-use tauri::Emitter;
 use shared::term::{TerminalDownMsg, TerminalScreen};
+use tauri::Emitter;
 
 use crate::terminal_size;
 
@@ -23,8 +23,8 @@ impl EventListener for EventProxy {
 pub struct ATerm {
     pub term: Arc<FairMutex<Term<EventProxy>>>,
 
-    pub rows : u16,
-    pub cols : u16,
+    pub rows: u16,
+    pub cols: u16,
 
     /// Use tx to write things to terminal instance from outside world
     pub tx: Notifier,
@@ -66,15 +66,14 @@ impl ATerm {
                 if let Ok(event) = event_receiver.recv() {
                     if let Event::Exit = event {
                         break;
-                    }
-                    else {
+                    } else {
                         if let Some(app_handle) = crate::APP_HANDLE.read().unwrap().clone() {
                             let term = crate::TERM.lock().unwrap();
                             let content = terminal_instance_to_string(&term);
                             let payload = TerminalScreen {
                                 cols: term.cols,
                                 rows: term.rows,
-                                content: content
+                                content: content,
                             };
                             let payload = TerminalDownMsg::FullTermUpdate(payload);
                             let payload = serde_json::json!(payload);
@@ -102,7 +101,7 @@ pub fn terminal_instance_to_string(terminal_instance: &ATerm) -> String {
 }
 
 fn term_grid_to_string(grid: &Grid<Cell>, rows: u16, cols: u16) -> String {
-    let mut term_content = String::with_capacity((rows*cols) as usize);
+    let mut term_content = String::with_capacity((rows * cols) as usize);
 
     // Populate string from grid
     for indexed in grid.display_iter() {

@@ -1,58 +1,46 @@
 use std::ops::Index;
 
 use chrono::format;
-use zoon::*;
-use zoon::{println, eprintln, *};
 use shared::term::{TerminalDownMsg, TerminalScreen, TerminalUpMsg};
 use unicode_segmentation::UnicodeSegmentation;
+use zoon::*;
+use zoon::{eprintln, println, *};
 
 // use tokio::time::timeout;
-pub static TERM_OPEN: Lazy<Mutable<bool>> = Lazy::new(|| {false.into()});
+pub static TERM_OPEN: Lazy<Mutable<bool>> = Lazy::new(|| false.into());
 
 pub const TERMINAL_COLOR: Oklch = color!("oklch(20% 0.125 262.26)");
 
-pub static  TERMINAL_STATE: Lazy<Mutable<TerminalDownMsg>> =
-    Lazy::new(|| {
-        Mutable::new(TerminalDownMsg::TermNotStarted)
-    });
+pub static TERMINAL_STATE: Lazy<Mutable<TerminalDownMsg>> =
+    Lazy::new(|| Mutable::new(TerminalDownMsg::TermNotStarted));
 
 pub fn root() -> impl Element {
-    let terminal =
-        El::new()
-            .s(Width::fill())
-            .s(Height::fill())
-            .s(Background::new().color(TERMINAL_COLOR))
-            .s(RoundedCorners::all(7))
-            .s(Font::new().family([
-                FontFamily::new("Lucida Console"),
-                FontFamily::new("Courier"),
-                FontFamily::new("monospace")
-                ]))
-            .update_raw_el(|raw_el| {
-                raw_el.global_event_handler(|event: events::KeyDown| {
-                    send_char(
-                        (&event).key().as_str(),
-                        (&event).ctrl_key(),
-                    );
-                })
+    let terminal = El::new()
+        .s(Width::fill())
+        .s(Height::fill())
+        .s(Background::new().color(TERMINAL_COLOR))
+        .s(RoundedCorners::all(7))
+        .s(Font::new().family([
+            FontFamily::new("Lucida Console"),
+            FontFamily::new("Courier"),
+            FontFamily::new("monospace"),
+        ]))
+        .update_raw_el(|raw_el| {
+            raw_el.global_event_handler(|event: events::KeyDown| {
+                send_char((&event).key().as_str(), (&event).ctrl_key());
             })
-            .child_signal(TERMINAL_STATE.signal_cloned().map(
-                |down_msg| {
-                    match down_msg {
-                        TerminalDownMsg::FullTermUpdate(term) => {
-                            make_grid_with_newlines(&term)
-                        },
-                        TerminalDownMsg::TermNotStarted => {
-                            "Term not yet started!".to_string()
-                        },
-                        TerminalDownMsg::BackendTermStartFailure(msg) => {
-                            format!("Error: BackendTermStartFailure: {}", msg)
-                        }
+        })
+        .child_signal(
+            TERMINAL_STATE
+                .signal_cloned()
+                .map(|down_msg| match down_msg {
+                    TerminalDownMsg::FullTermUpdate(term) => make_grid_with_newlines(&term),
+                    TerminalDownMsg::TermNotStarted => "Term not yet started!".to_string(),
+                    TerminalDownMsg::BackendTermStartFailure(msg) => {
+                        format!("Error: BackendTermStartFailure: {}", msg)
                     }
-                }
-                )
-            )
-            ;
+                }),
+        );
     let root = Column::new()
         .s(Width::fill())
         .s(Height::fill())
@@ -61,10 +49,7 @@ pub fn root() -> impl Element {
     root
 }
 
-fn send_char(
-    s           : &str,
-    has_control : bool,
-    ) {
+fn send_char(s: &str, has_control: bool) {
     match process_str(s, has_control) {
         Some(c) => {
             let send_c = c.clone();
@@ -74,12 +59,11 @@ fn send_char(
         }
         None => {}
     }
-
 }
 
-
 fn make_grid_with_newlines(term: &TerminalScreen) -> String {
-    let mut formatted = String::with_capacity(term.content.len() + (term.content.len() / term.cols as usize));
+    let mut formatted =
+        String::with_capacity(term.content.len() + (term.content.len() / term.cols as usize));
 
     term.content.chars().enumerate().for_each(|(i, c)| {
         formatted.push(c);
@@ -91,20 +75,41 @@ fn make_grid_with_newlines(term: &TerminalScreen) -> String {
     formatted
 }
 
-
 fn process_str(s: &str, has_ctrl: bool) -> Option<char> {
     match s {
-        "Enter"         => {return Some('\n');}
-        "Escape"        => {return Some('\x1B');}
-        "Backspace"     => {return Some('\x08');}
-        "ArrowUp"       => {return Some('\x10');}
-        "ArrowDown"     => {return Some('\x0E');}
-        "ArrowLeft"     => {return Some('\x02');}
-        "ArrowRight"    => {return Some('\x06');}
-        "Control"       => {return None;}
-        "Shift"         => {return None;}
-        "Meta"          => {return None;}
-        "Alt"           => {return None;}
+        "Enter" => {
+            return Some('\n');
+        }
+        "Escape" => {
+            return Some('\x1B');
+        }
+        "Backspace" => {
+            return Some('\x08');
+        }
+        "ArrowUp" => {
+            return Some('\x10');
+        }
+        "ArrowDown" => {
+            return Some('\x0E');
+        }
+        "ArrowLeft" => {
+            return Some('\x02');
+        }
+        "ArrowRight" => {
+            return Some('\x06');
+        }
+        "Control" => {
+            return None;
+        }
+        "Shift" => {
+            return None;
+        }
+        "Meta" => {
+            return None;
+        }
+        "Alt" => {
+            return None;
+        }
         _ => {}
     }
 
@@ -137,6 +142,6 @@ fn process_for_ctrl_char(c: char, has_ctrl: bool) -> char {
     }
 }
 
-fn char_is_between_inclusive(c : char, lo_char : char, hi_char : char) -> bool {
+fn char_is_between_inclusive(c: char, lo_char: char, hi_char: char) -> bool {
     c >= lo_char && c <= hi_char
 }

@@ -4,13 +4,13 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::sync::{Arc, RwLock as StdRwLock};
 use std::time::Duration;
+use tauri::Emitter;
 use tauri::{async_runtime::RwLock, AppHandle};
 use tauri_plugin_dialog::DialogExt;
 use tokio::fs::read_to_string;
 use tokio::time::sleep;
 use wasmtime::AsContextMut;
 use wellen::simple::Waveform;
-use tauri::Emitter;
 
 type Filename = String;
 type FolderPath = String;
@@ -28,22 +28,21 @@ type ComponentId = String;
 use alacritty_terminal::event::Notify;
 use shared::term::{TerminalDownMsg, TerminalScreen};
 
-mod component_manager;
 mod aterm;
+mod component_manager;
 mod terminal_size;
 use std::sync::Mutex;
 
 pub static APP_HANDLE: Lazy<Arc<StdRwLock<Option<AppHandle>>>> = Lazy::new(<_>::default);
 pub static WAVEFORM: Lazy<StdRwLock<Arc<RwLock<Option<Waveform>>>>> = Lazy::new(<_>::default);
 
-static TERM: Lazy<Mutex<aterm::ATerm>> = Lazy::new(|| {
-    Mutex::new(aterm::ATerm::new().expect("Failed to initialize ATerm"))
-});
+static TERM: Lazy<Mutex<aterm::ATerm>> =
+    Lazy::new(|| Mutex::new(aterm::ATerm::new().expect("Failed to initialize ATerm")));
 
 #[derive(Default)]
 struct Store {
     waveform: Arc<RwLock<Option<Waveform>>>,
-    val     : Arc<RwLock<bool>>,
+    val: Arc<RwLock<bool>>,
 }
 
 #[tauri::command(rename_all = "snake_case")]
@@ -159,7 +158,7 @@ async fn unload_signal(signal_ref_index: usize, store: tauri::State<'_, Store>) 
 }
 
 #[tauri::command(rename_all = "snake_case")]
-async fn send_char(c : String) -> Result<(), ()> {
+async fn send_char(c: String) -> Result<(), ()> {
     if c.len() == 1 {
         let term = TERM.lock().unwrap();
         term.tx.notify(c.into_bytes());
@@ -365,7 +364,7 @@ pub fn run() {
                     let payload = TerminalScreen {
                         cols: term.cols,
                         rows: term.rows,
-                        content: content
+                        content: content,
                     };
                     let payload = TerminalDownMsg::FullTermUpdate(payload);
                     let payload = serde_json::json!(payload);
