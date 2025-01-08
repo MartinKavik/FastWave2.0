@@ -178,8 +178,13 @@ pub async fn read_file(path: &str) -> Result<String, String> {
     Err(String::from("Reading files is not supported in the browser."))
 }
 
-pub(super) async fn select_folder_to_open() -> Option<super::FolderPath> {
+pub async fn select_folder_to_open() -> Option<super::FolderPath> {
     // @TODO error message for user
     eprintln!("Opening folders is not supported in the browser.");
     None
+}
+
+pub async fn file_tree(_path: PathBuf) -> shared::FileTreeItem {
+    // @TODO error message for user
+    panic!("Opening folders is not supported in the browser.");
 }

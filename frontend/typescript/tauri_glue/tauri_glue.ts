@@ -7,6 +7,7 @@ const listen = event.listen;
 
 type Filename = string;
 type FolderPath = string;
+type FilePath = string;
 type JavascriptCode = string;
 type WellenHierarchy = unknown;
 type Timeline = unknown;
@@ -21,6 +22,8 @@ type RemovedDiagramConnectorsCount = number;
 type DiagramConnectorPath = string;
 type DiagramConnectorName = string;
 type ComponentId = string;
+
+type FileTreeItem = unknown;
 
 export async function show_window(): Promise<void> {
     return await invoke("show_window");
@@ -96,10 +99,14 @@ export async function open_konata_file() {
     return await invoke("open_konata_file");
 }
 
-export async function read_file(path: string): Promise<string> {
+export async function read_file(path: FilePath): Promise<string> {
     return await invoke("read_file", { path });
 }
 
 export async function select_folder_to_open(): Promise<FolderPath | undefined> {
     return await invoke("select_folder_to_open");
+}
+
+export async function file_tree(path: FolderPath): Promise<FileTreeItem> {
+    return await invoke("file_tree", { path });
 }

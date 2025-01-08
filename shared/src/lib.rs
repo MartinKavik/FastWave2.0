@@ -1,4 +1,5 @@
 use moonlight::*;
+use std::path::PathBuf;
 
 mod var_format;
 pub use var_format::VarFormat;
@@ -43,4 +44,26 @@ pub enum DiagramConnectorMessage {
         component_id: String,
         text: String,
     },
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(crate = "serde")]
+pub enum FileTreeItem {
+    Folder { 
+        name: String, 
+        #[allow(dead_code)]
+        path: PathBuf, 
+        children: Vec<FileTreeItem> 
+    },
+    File { name: String, path: PathBuf }
+}
+
+impl FileTreeItem {
+    pub fn new_folder(path: PathBuf, children: Vec<FileTreeItem>) -> Self {
+        Self::Folder { name: path.file_name().unwrap().to_string_lossy().to_string(), path, children }
+    }
+
+    pub fn new_file(path: PathBuf) -> Self {
+        Self::File { name: path.file_name().unwrap().to_string_lossy().to_string(), path }
+    }
 }
