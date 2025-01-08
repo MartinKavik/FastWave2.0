@@ -3,6 +3,8 @@
 
 // NOTE: `FASTWAVE_PLATFORM` is set in `Makefile.toml` tasks and then in `build.rs`
 
+use std::path::PathBuf;
+
 use crate::STORE;
 use shared::DiagramConnectorMessage;
 
@@ -143,5 +145,9 @@ pub async fn read_file(path: &str) -> Result<String, String> {
 
 pub async fn select_folder_to_open() -> Option<FolderPath> {
     platform::select_folder_to_open().await
+}
+
+pub async fn file_tree(path: PathBuf) -> shared::FileTreeItem {
+    platform::file_tree(path).await
 }
 

@@ -8,27 +8,7 @@ pub use code_editor::CodeEditorController;
 
 use crate::platform;
 
-#[derive(Debug)]
-enum FileTreeItem {
-    Folder { 
-        name: String, 
-        #[allow(dead_code)]
-        path: PathBuf, 
-        children: Vec<FileTreeItem> 
-    },
-    File { name: String, path: PathBuf }
-}
-
-impl FileTreeItem {
-    pub fn new_folder(path: PathBuf, children: Vec<FileTreeItem>) -> Self {
-        Self::Folder { name: path.file_name().unwrap().to_string_lossy().to_string(), path, children }
-    }
-
-    pub fn new_file(path: PathBuf) -> Self {
-        Self::File { name: path.file_name().unwrap().to_string_lossy().to_string(), path }
-    }
-}
-
+#[derive(Clone)]
 pub struct IdePanel {
     code_editor_controller: Mutable<Mutable<Option<SendWrapper<CodeEditorController>>>>,
     selected_file_path: Mutable<Option<PathBuf>>,
@@ -118,42 +98,26 @@ impl IdePanel {
     }
 
     fn file_tree_view(&self) -> impl Element {
-        let test_root = FileTreeItem::new_folder(
-            "D:/repos/FastWave2.0/test_files/ide".into(),
-            vec![
-                FileTreeItem::new_folder(
-                    "D:/repos/FastWave2.0/test_files/ide/ide_example_rust".into(),
-                    vec![
-                        FileTreeItem::new_folder(
-                            "D:/repos/FastWave2.0/test_files/ide/ide_example_rust/src".into(),
-                            vec![
-                                FileTreeItem::new_file("D:/repos/FastWave2.0/test_files/ide/ide_example_rust/src/main.rs".into())
-                            ]
-                        ),
-                        FileTreeItem::new_file("D:/repos/FastWave2.0/test_files/ide/ide_example_rust/Cargo.toml".into())
-                    ]
-                ),
-                FileTreeItem::new_folder(
-                    "D:/repos/FastWave2.0/test_files/ide/ide_example_verilog".into(),
-                    vec![
-                        FileTreeItem::new_file("D:/repos/FastWave2.0/test_files/ide/ide_example_verilog/example.v".into())
-                    ]
-                )
-            ]
-        );
+        let this = self.clone();
+        El::new().child_signal(self.selected_folder_path.signal_cloned().map_future(move |folder_path| {
+            let this = this.clone();
+            async move {
+                let Some(folder_path) = folder_path else { return None }; 
 
-        zoon::println!("{test_root:#?}");
-
-        El::new()
-            .child(self.file_tree_view_item(test_root))
+                let root = platform::file_tree(folder_path).await;
+        
+                zoon::println!("{root:#?} (in Browser, from Tauri");
+                Some(this.file_tree_view_item(root))
+            }
+        }).boxed_local().map(Option::flatten))
     }
 
-    fn file_tree_view_item(&self, item: FileTreeItem) -> impl Element {
+    fn file_tree_view_item(&self, item: shared::FileTreeItem) -> impl Element {
         let left_padding = 20;
         let top_padding = 5;
         let inner_padding = Padding::new().x(10).y(3);
         match item {
-            FileTreeItem::Folder { name, path: _, children } => {
+            shared::FileTreeItem::Folder { name, path: _, children } => {
                 Column::with_tag(Tag::Custom("details"))
                     .s(Padding::new().left(left_padding).top(top_padding))
                     .s(Width::fill())
@@ -171,7 +135,7 @@ impl IdePanel {
                     }))
                     .left_either()
             }
-            FileTreeItem::File { name, path } => {
+            shared::FileTreeItem::File { name, path } => {
                 let is_selected = self.selected_file_path.signal_ref(clone!((path) move |selected_path| {
                     if let Some(selected_path) = selected_path.as_ref() {
                         return selected_path == &path
