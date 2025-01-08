@@ -13,7 +13,7 @@ mod diagram_panel;
 use diagram_panel::{DiagramPanel, ExcalidrawController};
 
 mod ide_panel;
-use ide_panel::{IdePanel, CodeEditorController};
+use ide_panel::{CodeEditorController, IdePanel};
 
 mod waveform_panel;
 use waveform_panel::{PixiController, WaveformPanel};

@@ -49,21 +49,31 @@ pub enum DiagramConnectorMessage {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(crate = "serde")]
 pub enum FileTreeItem {
-    Folder { 
-        name: String, 
+    Folder {
+        name: String,
         #[allow(dead_code)]
-        path: PathBuf, 
-        children: Vec<FileTreeItem> 
+        path: PathBuf,
+        children: Vec<FileTreeItem>,
     },
-    File { name: String, path: PathBuf }
+    File {
+        name: String,
+        path: PathBuf,
+    },
 }
 
 impl FileTreeItem {
     pub fn new_folder(path: PathBuf, children: Vec<FileTreeItem>) -> Self {
-        Self::Folder { name: path.file_name().unwrap().to_string_lossy().to_string(), path, children }
+        Self::Folder {
+            name: path.file_name().unwrap().to_string_lossy().to_string(),
+            path,
+            children,
+        }
     }
 
     pub fn new_file(path: PathBuf) -> Self {
-        Self::File { name: path.file_name().unwrap().to_string_lossy().to_string(), path }
+        Self::File {
+            name: path.file_name().unwrap().to_string_lossy().to_string(),
+            path,
+        }
     }
 }

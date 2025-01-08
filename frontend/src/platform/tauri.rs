@@ -1,7 +1,7 @@
 use shared::DiagramConnectorMessage;
 use shared::term::{TerminalDownMsg, TerminalScreen};
-use zoon::*;
 use std::path::PathBuf;
+use zoon::*;
 
 pub(super) async fn show_window() {
     tauri_glue::show_window().await.unwrap_throw()
@@ -149,8 +149,7 @@ pub(super) async fn select_folder_to_open() -> Option<super::FolderPath> {
 
 pub async fn file_tree(path: PathBuf) -> shared::FileTreeItem {
     let path = path.to_str().unwrap_throw();
-    serde_wasm_bindgen::from_value(tauri_glue::file_tree(path).await.unwrap_throw())
-        .unwrap_throw()
+    serde_wasm_bindgen::from_value(tauri_glue::file_tree(path).await.unwrap_throw()).unwrap_throw()
 }
 
 mod tauri_glue {

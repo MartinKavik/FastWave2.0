@@ -150,4 +150,3 @@ pub async fn select_folder_to_open() -> Option<FolderPath> {
 pub async fn file_tree(path: PathBuf) -> shared::FileTreeItem {
     platform::file_tree(path).await
 }
-

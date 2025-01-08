@@ -175,7 +175,9 @@ pub async fn open_konata_file() {
 pub async fn read_file(path: &str) -> Result<String, String> {
     // @TODO error message for user
     eprintln!("Reading files is not supported in the browser.");
-    Err(String::from("Reading files is not supported in the browser."))
+    Err(String::from(
+        "Reading files is not supported in the browser.",
+    ))
 }
 
 pub async fn select_folder_to_open() -> Option<super::FolderPath> {
