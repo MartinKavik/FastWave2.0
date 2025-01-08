@@ -77,7 +77,7 @@ pub async fn unload_signal(signal_ref: wellen::SignalRef) {
     platform::unload_signal(signal_ref).await
 }
 
-pub async fn send_char(c : String) {
+pub async fn send_char(c: String) {
     platform::send_char(c).await
 }
 
@@ -121,9 +121,7 @@ pub async fn listen_diagram_connectors_messages(
     platform::listen_diagram_connectors_messages(on_message).await;
 }
 
-pub async fn listen_term_update(
-    on_message: impl FnMut(TerminalDownMsg) + 'static,
-) {
+pub async fn listen_term_update(on_message: impl FnMut(TerminalDownMsg) + 'static) {
     platform::listen_term_update(on_message).await;
 }
 

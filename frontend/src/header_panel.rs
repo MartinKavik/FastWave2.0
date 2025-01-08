@@ -1,7 +1,7 @@
+use crate::term::TERM_OPEN;
 use crate::{platform, theme::*, Filename, Layout, Mode};
 use std::sync::Arc;
 use zoon::*;
-use crate::term::TERM_OPEN;
 
 pub struct HeaderPanel {
     hierarchy: Mutable<Option<Arc<wellen::Hierarchy>>>,
@@ -226,16 +226,11 @@ impl HeaderPanel {
             ))
             .s(Align::new().left())
             .s(RoundedCorners::all(15))
-            .label(
-                El::new()
-                    .s(Font::new().no_wrap())
-                    .child("Open Terminal"),
-            )
+            .label(El::new().s(Font::new().no_wrap()).child("Open Terminal"))
             .on_hovered_change(move |is_hovered| hovered.set_neq(is_hovered))
             .on_press(move || {
                 let term_open = TERM_OPEN.get();
                 TERM_OPEN.set(!term_open);
-
             })
     }
 }
