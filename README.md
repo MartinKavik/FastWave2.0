@@ -83,6 +83,11 @@ Currently being hosted at https://git.joyofhardware.com/Products/FastWave2.0
   <img width="500" src="docs/screenshot_diagram_connector_rs.png" alt="Fastwave - Diagram Connector Code snippet" />
 </p>
 
+<p align="center">IDE demo</p>
+<p align="center">
+  <img width="500" src="docs/video_ide.gif" alt="Fastwave - IDE demo" />
+</p>
+
 ---
 
 ### Installation (desktop version):
